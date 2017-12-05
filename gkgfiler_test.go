@@ -41,7 +41,7 @@ func TestGetGoSrc(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			build.Default.GOPATH = tt.gopath
 
-			got, e := GetGoSrc()
+			got, e := GetGoSrcPath()
 			if (e != nil) != tt.wantErr {
 				t.Errorf("GetGoSrc() = %v, want %v", e != nil, tt.wantErr)
 			}

@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 )
 
-//GetGoSrc is get $GOPATH/src
-func GetGoSrc() (string, error) {
+//GetGoSrcPath is get $GOPATH/src
+func GetGoSrcPath() (string, error) {
 	// lookup go path
 	gopath := build.Default.GOPATH
 	if gopath == "" {
