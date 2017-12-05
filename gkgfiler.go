@@ -1,6 +1,7 @@
 package gkgfiler
 
 import (
+	"errors"
 	"fmt"
 	"go/build"
 	"io/ioutil"
@@ -9,15 +10,17 @@ import (
 )
 
 //GetGoSrc is get $GOPATH/src
-func GetGoSrc() string {
+func GetGoSrc() (string, error) {
 	// lookup go path
 	gopath := build.Default.GOPATH
 	if gopath == "" {
-		fmt.Println("GOPATHが設定されていません.")
+		fmt.Println("GOPATHが設定されていません")
+		return "", errors.New("GOPATHが設定されていません")
 	}
 	//  取得した$GOPATHが:つなぎなどで複数設定されていたら一番先頭を使う。
 	srcRoot := filepath.Join(filepath.SplitList(gopath)[0], "src")
-	return srcRoot
+	return srcRoot, nil
+
 }
 
 //Exist is check file exist
