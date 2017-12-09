@@ -379,22 +379,79 @@ func TestAppendText(t *testing.T) {
 	}
 }
 
-func Test_getPathsRecurciveImpl(t *testing.T) {
+func TestWriteText(t *testing.T) {
+	const text = "this is input text"
 	type args struct {
-		dir              string
-		paths            []string
-		matchingPatterns []string
+		path            string
+		str             string
+		createIfNothing bool
+		perm            os.FileMode
 	}
 	tests := []struct {
-		name          string
-		args          args
-		wantFileNames []string
-		wantErr       bool
+		name        string
+		args        args
+		wantErr     bool
+		wantContain bool
 	}{
-	// TODO: Add test cases.
+		{
+			name: "テキストで上書きされている",
+			args: args{
+				path:            "testDir0/test.text",
+				str:             text,
+				createIfNothing: false,
+				perm:            0777,
+			},
+			wantErr:     false,
+			wantContain: true,
+		},
+		{
+			name: "createIfNothingをfalseにしてを存在しないファイルを指定するとエラー",
+			args: args{
+				path:            "testDir0/nothing",
+				str:             text,
+				createIfNothing: false,
+				perm:            0777,
+			},
+			wantErr:     true,
+			wantContain: false,
+		},
+		{
+			name: "createIfNothingをtrueにしてを存在しないファイルを指定すると作られて書き込まれる",
+			args: args{
+				path:            "testDir0/nothing",
+				str:             text,
+				createIfNothing: true,
+				perm:            0777,
+			},
+			wantErr:     false,
+			wantContain: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			createTestDirsAndFiles()
+			defer deleteTestDir()
+			err := WriteText(tt.args.path, tt.args.str, tt.args.createIfNothing, tt.args.perm)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("WriteText() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if err != nil && !tt.args.createIfNothing {
+				return
+			}
+
+			contain, _ := Contains(tt.args.path, testText)
+			if contain != !tt.wantContain {
+				t.Errorf("WriteText() OrigContain = %v, wantOrigContain %v", contain, !tt.wantContain)
+			}
+			contain, _ = Contains(tt.args.path, text)
+			if contain != tt.wantContain {
+				t.Errorf("WriteText() contain = %v, wantContain %v", contain, tt.wantContain)
+			}
+		})
+	}
+}
+
 func TestContains(t *testing.T) {
 	type args struct {
 		filename string
