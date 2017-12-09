@@ -344,6 +344,7 @@ func createTestDirsAndFiles() {
 	os.Create("./testDir0/testDir1/testDir3/test.text")
 	ioutil.WriteFile("./testDir0/test.text", []byte("this is test text"), 0777)
 }
+
 func deleteTestDir() {
 	os.RemoveAll("./testDir0")
 }
