@@ -137,7 +137,10 @@ func AppendText(path, appendStr string, perm os.FileMode) error {
 }
 
 //WriteText ファイルにテキストを上書き
-func WriteText(path, str string, perm os.FileMode) error {
+func WriteText(path, str string, createIfNothing bool, perm os.FileMode) error {
+	if !createIfNothing && !Exist(path) {
+		return errors.New("file not found")
+	}
 	e := ioutil.WriteFile(path, []byte(str), perm)
 	if e != nil {
 		return e
