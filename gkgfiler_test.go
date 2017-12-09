@@ -329,25 +329,7 @@ func TestGetPathsRecurcive(t *testing.T) {
 
 	deleteTestDir()
 }
-func createTestDirsAndFiles() {
-	os.MkdirAll("./testDir0/testDir1/testDir3", 0777)
-	os.Mkdir("./testDir0/testDir2", 0777)
-	os.Create("./testDir0/test.yaml")
-	os.Create("./testDir0/test.text")
-	os.Create("./testDir0/testDir1/test.go")
-	os.Create("./testDir0/testDir1/test1.go")
-	os.Create("./testDir0/testDir1/test.text")
-	os.Create("./testDir0/testDir2/test.go")
-	os.Create("./testDir0/testDir2/test.text")
-	os.Create("./testDir0/testDir1/testDir3/test.yaml")
-	os.Create("./testDir0/testDir1/testDir3/test.go")
-	os.Create("./testDir0/testDir1/testDir3/test.text")
-	ioutil.WriteFile("./testDir0/test.text", []byte("this is test text"), 0777)
-}
 
-func deleteTestDir() {
-	os.RemoveAll("./testDir0")
-}
 }
 
 func Test_getPathsRecurciveImpl(t *testing.T) {
@@ -428,4 +410,26 @@ func TestContains(t *testing.T) {
 		})
 	}
 	deleteTestDir()
+}
+
+func createTestDirsAndFiles() {
+	os.MkdirAll("./testDir0/testDir1/testDir3", 0777)
+	os.Mkdir("./testDir0/testDir2", 0777)
+	os.Create("./testDir0/test.yaml")
+	os.Create("./testDir0/test.text")
+	os.Create("./testDir0/testDir1/test.go")
+	os.Create("./testDir0/testDir1/test1.go")
+	os.Create("./testDir0/testDir1/test.text")
+	os.Create("./testDir0/testDir2/test.go")
+	os.Create("./testDir0/testDir2/test.text")
+	os.Create("./testDir0/testDir1/testDir3/test.yaml")
+	os.Create("./testDir0/testDir1/testDir3/test.go")
+	os.Create("./testDir0/testDir1/testDir3/test.text")
+	ioutil.WriteFile("./testDir0/test.text", []byte(testText), 0777)
+}
+
+const testText = "this is test text"
+
+func deleteTestDir() {
+	os.RemoveAll("./testDir0")
 }
