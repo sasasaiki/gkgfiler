@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestGetGoSrc(t *testing.T) {
+func TestGetGoSrcPath(t *testing.T) {
 	gopath := build.Default.GOPATH
 	fmt.Println(gopath)
 
