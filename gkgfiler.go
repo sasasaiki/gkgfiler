@@ -104,7 +104,7 @@ func ReplaceText(filename, origin, replace string, perm os.FileMode) error {
 		return e
 	}
 
-	output := strings.Replace(string(input), origin, filename, -1)
+	output := strings.Replace(string(input), origin, replace, -1)
 
 	e = ioutil.WriteFile(filename, []byte(output), perm)
 	if e != nil {
