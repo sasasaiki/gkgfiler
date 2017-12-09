@@ -330,6 +330,53 @@ func TestGetPathsRecurcive(t *testing.T) {
 	deleteTestDir()
 }
 
+func TestAppendText(t *testing.T) {
+	const appendText = "append text"
+	type args struct {
+		path      string
+		appendStr string
+		perm      os.FileMode
+	}
+	tests := []struct {
+		name        string
+		args        args
+		wantErr     bool
+		wantContain bool
+	}{
+		{
+			name: "テキストが追加されている",
+			args: args{
+				path:      "testDir0/test.text",
+				appendStr: appendText,
+				perm:      0777,
+			},
+			wantErr:     false,
+			wantContain: true,
+		},
+		{
+			name: "存在しないファイルを指定するとエラー",
+			args: args{
+				path:      "nothing",
+				appendStr: appendText,
+				perm:      0777,
+			},
+			wantErr:     true,
+			wantContain: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			createTestDirsAndFiles()
+			defer deleteTestDir()
+			if err := AppendText(tt.args.path, tt.args.appendStr, tt.args.perm); (err != nil) != tt.wantErr {
+				t.Errorf("AppendText() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			contain, _ := Contains("testDir0/test.text", appendText)
+			if contain != tt.wantContain {
+				t.Errorf("AppendText() contain = %v, wantContain %v", contain, tt.wantContain)
+			}
+		})
+	}
 }
 
 func Test_getPathsRecurciveImpl(t *testing.T) {
