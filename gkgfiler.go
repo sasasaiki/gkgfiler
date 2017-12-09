@@ -77,11 +77,11 @@ func IsDir(path string) (bool, error) {
 }
 
 //GetPathsRecurcive ディレクトリに含まれるファイルのパスを再帰的に取得
-func GetPathsRecurcive(dir string, matchingPatterns ...string) (paths []string, e error) {
-	return getPathsRecurciveImpl(dir, []string{}, matchingPatterns...)
+func GetPathsRecurcive(dir string, includeDir bool, matchingPatterns ...string) (paths []string, e error) {
+	return getPathsRecurciveImpl(dir, []string{}, includeDir, matchingPatterns...)
 }
 
-func getPathsRecurciveImpl(dir string, paths []string, matchingPatterns ...string) (fileNames []string, e error) {
+func getPathsRecurciveImpl(dir string, paths []string, includeDir bool, matchingPatterns ...string) (fileNames []string, e error) {
 	files, e := ioutil.ReadDir(dir)
 	if e != nil {
 		return nil, e
@@ -89,14 +89,14 @@ func getPathsRecurciveImpl(dir string, paths []string, matchingPatterns ...strin
 
 	for _, file := range files {
 		if file.IsDir() {
-			paths, e = getPathsRecurciveImpl(filepath.Join(dir, file.Name()), paths, matchingPatterns...)
+			paths, e = getPathsRecurciveImpl(filepath.Join(dir, file.Name()), paths, includeDir, matchingPatterns...)
 			if e != nil {
 				return nil, e
 			}
 		}
 	}
 
-	f, e := GetPaths(filepath.Join(dir), matchingPatterns...)
+	f, e := GetPaths(filepath.Join(dir), includeDir, matchingPatterns...)
 	if e != nil {
 		return nil, e
 	}
