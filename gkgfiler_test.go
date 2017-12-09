@@ -412,6 +412,104 @@ func TestContains(t *testing.T) {
 	deleteTestDir()
 }
 
+func TestReplaceText(t *testing.T) {
+	type args struct {
+		filename string
+		origin   string
+		replace  string
+		perm     os.FileMode
+	}
+	tests := []struct {
+		name        string
+		args        args
+		wantErr     bool
+		containOrig bool
+		containNew  bool
+	}{
+		{
+			name: "originがreplaceに置き換えられる",
+			args: args{
+				filename: "testDir0/test.text",
+				origin:   "test",
+				replace:  "replaced",
+				perm:     0777,
+			},
+			wantErr:     false,
+			containOrig: false,
+			containNew:  true,
+		},
+		{
+			name: "originが存在しなければreplaceに置き換えらない",
+			args: args{
+				filename: "testDir0/test.text",
+				origin:   "nothing",
+				replace:  "replaced",
+				perm:     0777,
+			},
+			wantErr:     false,
+			containOrig: true,
+			containNew:  false,
+		},
+		{
+			name: "存在しないパスを渡すとエラー",
+			args: args{
+				filename: "nothing",
+				origin:   "test",
+				replace:  "replaced",
+				perm:     0777,
+			},
+			wantErr:     true,
+			containOrig: false,
+			containNew:  false,
+		},
+		{
+			name: "ディレクトリのパスを渡すとエラー",
+			args: args{
+				filename: "testDir0",
+				origin:   "test",
+				replace:  "replaced",
+				perm:     0777,
+			},
+			wantErr:     true,
+			containOrig: false,
+			containNew:  false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			createTestDirsAndFiles()
+			defer deleteTestDir()
+
+			err := ReplaceText(tt.args.filename, tt.args.origin, tt.args.replace, tt.args.perm)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReplaceText() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if err != nil {
+				return
+			}
+
+			gotContainOrig, e := Contains("testDir0/test.text", testText)
+			if e != nil {
+				return
+			}
+			if gotContainOrig != tt.containOrig {
+				t.Errorf("ReplaceText() containOrig = %v, wantContainOrig %v", gotContainOrig, tt.containOrig)
+			}
+
+			gotContainNew, e := Contains("testDir0/test.text", "replaced")
+			if e != nil {
+				return
+			}
+			if gotContainNew != tt.containNew {
+				t.Errorf("ReplaceText() containNew = %v, wantContainNew %v", gotContainNew, tt.containNew)
+			}
+
+		})
+	}
+}
+
 func createTestDirsAndFiles() {
 	os.MkdirAll("./testDir0/testDir1/testDir3", 0777)
 	os.Mkdir("./testDir0/testDir2", 0777)
