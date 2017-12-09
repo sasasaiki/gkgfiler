@@ -51,6 +51,15 @@ func GetPaths(dir string, matchingPatterns ...string) (matches []string, e error
 	return matches, e
 }
 
+//IsDir return directory or notDirectory
+func IsDir(path string) (bool, error) {
+	fInfo, e := os.Stat(path)
+	if e != nil {
+		return false, e
+	}
+	return fInfo.IsDir(), nil
+}
+
 //GetPathsRecurcive ディレクトリに含まれるファイルのパスを再帰的に取得
 func GetPathsRecurcive(dir string, matchingPatterns ...string) (paths []string, e error) {
 	return getPathsRecurciveImpl(dir, []string{}, matchingPatterns...)
