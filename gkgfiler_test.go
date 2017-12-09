@@ -264,6 +264,7 @@ func TestGetPaths(t *testing.T) {
 func TestGetPathsRecurcive(t *testing.T) {
 	type args struct {
 		dir              string
+		includeDir       bool
 		matchingPatterns []string
 	}
 	tests := []struct {
@@ -272,11 +273,49 @@ func TestGetPathsRecurcive(t *testing.T) {
 		wantPaths []string
 		wantErr   bool
 	}{
-	// TODO: Add test cases.
+		{
+			name: "testDir0と*を渡すことでtestDir0以下の全てのファイルを取得できる",
+			args: args{
+				dir:              "testDir0",
+				matchingPatterns: []string{"*"},
+			},
+			wantPaths: []string{
+				"testDir0/test.yaml",
+				"testDir0/test.text",
+				"testDir0/testDir1/test.go",
+				"testDir0/testDir1/test1.go",
+				"testDir0/testDir1/test.text",
+				"testDir0/testDir2/test.go",
+				"testDir0/testDir2/test.text",
+				"testDir0/testDir1/testDir3/test.yaml",
+				"testDir0/testDir1/testDir3/test.go",
+				"testDir0/testDir1/testDir3/test.text",
+			},
+			wantErr: false,
+		},
+		{
+			name: "testDir0と*.goを渡すことでtestDir0以下の全ての.goファイルを取得できる",
+			args: args{
+				dir:              "testDir0",
+				matchingPatterns: []string{"*.go"},
+			},
+			wantPaths: []string{
+				"testDir0/testDir1/test.go",
+				"testDir0/testDir1/test1.go",
+				"testDir0/testDir2/test.go",
+				"testDir0/testDir1/testDir3/test.go",
+			},
+			wantErr: false,
+		},
 	}
+
+	createTestDirsAndFiles()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotPaths, err := GetPathsRecurcive(tt.args.dir, tt.args.matchingPatterns...)
+			gotPaths, err := GetPathsRecurcive(tt.args.dir, tt.args.includeDir, tt.args.matchingPatterns...)
+			sort.Strings(gotPaths)
+			sort.Strings(tt.wantPaths)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetPathsRecurcive() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -286,6 +325,9 @@ func TestGetPathsRecurcive(t *testing.T) {
 			}
 		})
 	}
+
+	deleteTestDir()
+}
 }
 
 func Test_getPathsRecurciveImpl(t *testing.T) {
