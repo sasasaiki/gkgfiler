@@ -115,7 +115,7 @@ func ReplaceText(filename, origin, replace string, perm os.FileMode) error {
 }
 
 //Contains ファイル内にfindStrが含まれるかどうかを返す
-func Contains(filename, findStr string, perm os.FileMode) (bool, error) {
+func Contains(filename, findStr string) (bool, error) {
 	input, e := ioutil.ReadFile(filename)
 	if e != nil {
 		return false, e
