@@ -24,7 +24,7 @@ func GetGoSrcPath() (string, error) {
 
 }
 
-//Exist is check file exist
+// Exist is check file exist
 func Exist(path string) bool {
 	_, e := os.Stat(path)
 	if e != nil {
@@ -33,7 +33,11 @@ func Exist(path string) bool {
 	return true
 }
 
-//GetPaths ディレクトリ内の、渡したパターンにマッチしたファイル,ディレクトリを全て取得する exsample "*.go","*.yaml"
+//GetPaths get files (and directory if includeDir=true) that match patterns
+/*
+	matchingPatterns exsample "*.go","*.yaml"
+	if you want all , "*"
+*/
 func GetPaths(dir string, includeDir bool, matchingPatterns ...string) (matches []string, e error) {
 	matches = []string{}
 	for _, match := range matchingPatterns {
@@ -61,7 +65,7 @@ func GetPaths(dir string, includeDir bool, matchingPatterns ...string) (matches 
 	return matches, e
 }
 
-//IsDir return directory or notDirectory
+//IsDir return whether it is directory or notDirectory
 func IsDir(path string) (bool, error) {
 	fInfo, e := os.Stat(path)
 	if e != nil {
@@ -70,7 +74,11 @@ func IsDir(path string) (bool, error) {
 	return fInfo.IsDir(), nil
 }
 
-//GetPathsRecurcive ディレクトリに含まれるファイルのパスを再帰的に取得
+//GetPathsRecurcive recursively find and get files (and directory if includeDir=true) that match patterns recurcive.
+/*
+	matchingPatterns exsample "*.go","*.yaml"
+	if you want all , "*"
+*/
 func GetPathsRecurcive(dir string, includeDir bool, matchingPatterns ...string) (paths []string, e error) {
 	return getPathsRecurciveImpl(dir, []string{}, includeDir, matchingPatterns...)
 }
@@ -97,7 +105,7 @@ func getPathsRecurciveImpl(dir string, paths []string, includeDir bool, matching
 	return append(paths, f...), e
 }
 
-//ReplaceText ファイル内のorigin文字列をreplaceに変更する
+//ReplaceText replace originStr to replaceStr
 func ReplaceText(filename, origin, replace string, perm os.FileMode) error {
 	input, e := ioutil.ReadFile(filename)
 	if e != nil {
@@ -114,7 +122,7 @@ func ReplaceText(filename, origin, replace string, perm os.FileMode) error {
 	return nil
 }
 
-//Contains ファイル内にfindStrが含まれるかどうかを返す
+//Contains return whether file contains findStr
 func Contains(filename, findStr string) (bool, error) {
 	input, e := ioutil.ReadFile(filename)
 	if e != nil {
@@ -123,7 +131,7 @@ func Contains(filename, findStr string) (bool, error) {
 	return strings.Contains(string(input), findStr), nil
 }
 
-//AppendText ファイルの末尾にテキストを追加
+//AppendText apeend appendStr at the end of the file
 func AppendText(path, appendStr string, perm os.FileMode) error {
 	f, e := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, perm)
 	if e != nil {
@@ -136,7 +144,7 @@ func AppendText(path, appendStr string, perm os.FileMode) error {
 	return nil
 }
 
-//WriteText ファイルにテキストを上書き
+//WriteText write text to file
 func WriteText(path, str string, createIfNothing bool, perm os.FileMode) error {
 	if !createIfNothing && !Exist(path) {
 		return errors.New("file not found")
