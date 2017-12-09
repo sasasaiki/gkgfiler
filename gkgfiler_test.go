@@ -3,7 +3,9 @@ package gkgfiler
 import (
 	"fmt"
 	"go/build"
+	"os"
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -97,6 +99,56 @@ func TestExist(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestIsDir(t *testing.T) {
+	type args struct {
+		path string
+	}
+	tests := []struct {
+		name     string
+		args     args
+		want     bool
+		existErr bool
+	}{
+		{
+			name: "pathがディレクトリのものならtrue",
+			args: args{
+				path: "./testDir0",
+			},
+			want:     true,
+			existErr: false,
+		},
+		{
+			name: "pathがディレクトリのものならfalse",
+			args: args{
+				path: "./gkgfiler.go",
+			},
+			want:     false,
+			existErr: false,
+		},
+		{
+			name: "pathを渡したファイルが存在しなければfalseとエラー",
+			args: args{
+				path: "./nothing",
+			},
+			want:     false,
+			existErr: true,
+		},
+	}
+	createTestDirsAndFiles()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, e := IsDir(tt.args.path)
+			if got != tt.want {
+				t.Errorf("IsDir() = %v, want %v", got, tt.want)
+			}
+			if (e != nil) != tt.existErr {
+				t.Errorf("IsDir() = %v, want %v", e, tt.existErr)
+			}
+		})
+	}
+	deleteTestDir()
 }
 
 func TestGetPaths(t *testing.T) {
