@@ -106,6 +106,7 @@ func getPathsRecurciveImpl(dir string, paths []string, includeDir bool, matching
 }
 
 //ReplaceText replace originStr to replaceStr
+//perm is permittion. exsample 0777.
 func ReplaceText(filename, origin, replace string, perm os.FileMode) error {
 	input, e := ioutil.ReadFile(filename)
 	if e != nil {
@@ -132,6 +133,7 @@ func Contains(filename, findStr string) (bool, error) {
 }
 
 //AppendText apeend appendStr at the end of the file
+//perm is permittion. exsample 0777.
 func AppendText(path, appendStr string, perm os.FileMode) error {
 	f, e := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, perm)
 	if e != nil {
@@ -145,6 +147,8 @@ func AppendText(path, appendStr string, perm os.FileMode) error {
 }
 
 //WriteText write text to file
+//perm is permittion. exsample 0777.
+//When createIfNothing is set to true, a case where it does not exist is created and written
 func WriteText(path, str string, createIfNothing bool, perm os.FileMode) error {
 	if !createIfNothing && !Exist(path) {
 		return errors.New("file not found")
