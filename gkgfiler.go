@@ -39,14 +39,30 @@ func Exist(path string) bool {
 // 	}
 // }
 
-//GetPaths ディレクトリ内の、渡したパターンにマッチしたファイルを全て取得する exsample "*.go","*.yaml"
-func GetPaths(dir string, matchingPatterns ...string) (matches []string, e error) {
+//GetPaths ディレクトリ内の、渡したパターンにマッチしたファイル,ディレクトリを全て取得する exsample "*.go","*.yaml"
+func GetPaths(dir string, includeDir bool, matchingPatterns ...string) (matches []string, e error) {
+	matches = []string{}
 	for _, match := range matchingPatterns {
-		files, e := filepath.Glob(filepath.Join(dir + match))
+		paths, e := filepath.Glob(filepath.Join(dir, match))
 		if e != nil {
 			return nil, e
 		}
-		matches = append(matches, files...)
+
+		if !includeDir {
+			nonDir := make([]string, 0, len(paths))
+
+			for _, p := range paths {
+				isDir, e := IsDir(p)
+				if e != nil || isDir {
+					continue
+				}
+
+				nonDir = append(nonDir, p)
+			}
+			paths = nonDir
+		}
+
+		matches = append(matches, paths...)
 	}
 	return matches, e
 }
