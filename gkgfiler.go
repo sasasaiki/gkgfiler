@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 //GetGoSrcPath is get $GOPATH/src
@@ -31,13 +32,6 @@ func Exist(path string) bool {
 	}
 	return true
 }
-
-// func ReplaceTextInFiles(path, projectPath string) {
-// 	paths := getPathsRecurcive(path, []string{})
-// 	for _, paths := range paths {
-// 		replacePathInFile(file, projectPath)
-// 	}
-// }
 
 //GetPaths ディレクトリ内の、渡したパターンにマッチしたファイル,ディレクトリを全て取得する exsample "*.go","*.yaml"
 func GetPaths(dir string, includeDir bool, matchingPatterns ...string) (matches []string, e error) {
@@ -103,23 +97,50 @@ func getPathsRecurciveImpl(dir string, paths []string, includeDir bool, matching
 	return append(paths, f...), e
 }
 
-// // 書き込み処理を行う
-// func replaceTextInFile(filename, projectPath string) {
-// 	input, err := ioutil.ReadFile(filename)
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
+//ReplaceText ファイル内のorigin文字列をreplaceに変更する
+func ReplaceText(filename, origin, replace string, perm os.FileMode) error {
+	input, e := ioutil.ReadFile(filename)
+	if e != nil {
+		return e
+	}
 
-// 	lines := strings.Split(string(input), "\n")
+	output := strings.Replace(string(input), origin, filename, -1)
 
-// 	const origin = "github.com/sasasaiki/gokigen"
-// 	for i, line := range lines {
-// 		lines[i] = strings.Replace(line, origin, projectPath, -1)
-// 	}
+	e = ioutil.WriteFile(filename, []byte(output), perm)
+	if e != nil {
+		return e
+	}
 
-// 	output := strings.Join(lines, "\n")
-// 	err = ioutil.WriteFile(filename, []byte(output), 0644)
-// 	if err != nil {
-// 		log.Fatalln(err)
-// 	}
-// }
+	return nil
+}
+
+//Contains ファイル内にfindStrが含まれるかどうかを返す
+func Contains(filename, findStr string, perm os.FileMode) (bool, error) {
+	input, e := ioutil.ReadFile(filename)
+	if e != nil {
+		return false, e
+	}
+	return strings.Contains(string(input), findStr), nil
+}
+
+//AppendText ファイルの末尾にテキストを追加
+func AppendText(path, appendStr string, perm os.FileMode) error {
+	f, e := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, perm)
+	if e != nil {
+		return e
+	}
+	defer f.Close()
+
+	fmt.Fprintln(f, appendStr)
+
+	return nil
+}
+
+//WriteText ファイルにテキストを上書き
+func WriteText(path, str string, perm os.FileMode) error {
+	e := ioutil.WriteFile(path, []byte(str), perm)
+	if e != nil {
+		return e
+	}
+	return nil
+}
