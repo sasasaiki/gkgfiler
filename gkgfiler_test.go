@@ -3,6 +3,7 @@ package gkgfiler
 import (
 	"fmt"
 	"go/build"
+	"io/ioutil"
 	"os"
 	"reflect"
 	"sort"
@@ -341,6 +342,7 @@ func createTestDirsAndFiles() {
 	os.Create("./testDir0/testDir1/testDir3/test.yaml")
 	os.Create("./testDir0/testDir1/testDir3/test.go")
 	os.Create("./testDir0/testDir1/testDir3/test.text")
+	ioutil.WriteFile("./testDir0/test.text", []byte("this is test text"), 0777)
 }
 func deleteTestDir() {
 	os.RemoveAll("./testDir0")
@@ -363,14 +365,66 @@ func Test_getPathsRecurciveImpl(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotFileNames, err := getPathsRecurciveImpl(tt.args.dir, tt.args.paths, tt.args.matchingPatterns...)
+func TestContains(t *testing.T) {
+	type args struct {
+		filename string
+		findStr  string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "渡した文字列が含まれていればtrue",
+			args: args{
+				filename: "testDir0/test.text",
+				findStr:  "this is test text",
+			},
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name: "渡した単語が含まれてなければfalse",
+			args: args{
+				filename: "testDir0/test.text",
+				findStr:  "hoge",
+			},
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name: "存在しないファイルを渡すとerror",
+			args: args{
+				filename: "nothing",
+				findStr:  "hoge",
+			},
+			want:    false,
+			wantErr: true,
+		},
+		{
+			name: "ディレクトリを渡すとerror",
+			args: args{
+				filename: "testDir0",
+				findStr:  "hoge",
+			},
+			want:    false,
+			wantErr: true,
+		},
+	}
+	createTestDirsAndFiles()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Contains(tt.args.filename, tt.args.findStr)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getPathsRecurciveImpl() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Contains() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(gotFileNames, tt.wantFileNames) {
-				t.Errorf("getPathsRecurciveImpl() = %v, want %v", gotFileNames, tt.wantFileNames)
+			if got != tt.want {
+				t.Errorf("Contains() = %v, want %v", got, tt.want)
 			}
 		})
 	}
+	deleteTestDir()
 }
