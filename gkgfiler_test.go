@@ -363,7 +363,7 @@ func TestContains(t *testing.T) {
 			name: "渡した文字列が含まれていればtrue",
 			args: args{
 				filename: "testDir0/test.text",
-				findStr:  "this is test text",
+				findStr:  testText,
 			},
 			want:    true,
 			wantErr: false,
